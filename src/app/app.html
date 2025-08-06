@@ -1,0 +1,24 @@
+<app-header></app-header>
+
+<body>
+  <h2>Eingabe</h2>
+  <form (ngSubmit)="submitForm()">
+    <input type="text" name="input" [(ngModel)]="input" />
+    <button type="submit">Senden</button>
+  </form>
+
+  <mat-divider></mat-divider>
+
+  <h3>Verlauf</h3>
+  <ul>
+    @for (entry of history; track entry) {
+      <li style="list-style-type: none;" >
+        <input type="checkbox" (change)="selectItem(entry)" />
+        {{entry[1]}}
+      </li>
+    }
+  </ul>
+  <p>Aktuelle Anzahl der Einträge: {{counter}}</p>
+  <button id="clear-history" (click)="clearHistory()">Verlauf löschen</button>
+  <button id="delete-selected" (click)="deleteSelected()">Ausgewählte löschen</button>
+</body>
