@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<body>
+<main>
   <h2>Eingabe</h2>
   <form (ngSubmit)="submitForm()">
     <input type="text" name="input" [(ngModel)]="input" />
@@ -21,4 +21,4 @@
   <p>Aktuelle Anzahl der Einträge: {{counter}}</p>
   <button id="clear-history" (click)="clearHistory()">Verlauf löschen</button>
   <button id="delete-selected" (click)="deleteSelected()">Ausgewählte löschen</button>
-</body>
+</main>

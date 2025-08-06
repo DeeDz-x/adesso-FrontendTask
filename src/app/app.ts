@@ -1,8 +1,9 @@
-import {Component} from '@angular/core';
+import {Component, OnInit, Inject, PLATFORM_ID} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {HttpClient} from '@angular/common/http';
 import { Header } from './header/header';
 import {MatDividerModule} from '@angular/material/divider';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -12,20 +13,22 @@ import {MatDividerModule} from '@angular/material/divider';
   imports: [FormsModule, Header, MatDividerModule],
 })
 
-export class App {
+export class App implements OnInit {
 
   input = '';
   history: [number, string][] = []; // Stored as tuples to provide a unique identifier for each entry
   counter = 0; // Counter for the number of entries in the history
   deleteArr: [number, string][] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {} // Inject PLATFORM_ID to check if the code is running in the browser - modified by Copilot
 
   ngOnInit() {
-    const storedHistory = localStorage.getItem('history');
-    if (storedHistory) {
-      this.history = JSON.parse(storedHistory);
-      console.log('Verlauf geladen:', this.history);
+    if (isPlatformBrowser(this.platformId)) {
+      const storedHistory = localStorage.getItem('history');
+      if (storedHistory) {
+        this.history = JSON.parse(storedHistory);
+        console.log('Verlauf geladen:', this.history);
+      }
     }
     this.counter = this.countEntries();
   }
@@ -40,9 +43,11 @@ export class App {
       const id  =  this.history.length > 0 ? this.history.length+1 : 0;
       this.history.push([id, this.input]);
 
-      localStorage.setItem('history', JSON.stringify(this.history));
-      console.log('Form submitted:', this.input);
-      console.log('History:', this.history);
+      if (isPlatformBrowser(this.platformId)) { //check added by Copilot - LocalStorage was working but constantly gave an error message. Copilot suggested this check
+        localStorage.setItem('history', JSON.stringify(this.history));
+      }
+      console.log('Text aus Input:', this.input);
+      console.log('Historie:', this.history);
 
       this.http.post<{ reply: string }>('http://localhost:5000/api/text', { text: this.input })
         .subscribe(response => {
@@ -69,7 +74,9 @@ export class App {
    */
   clearHistory() {
     this.history = [];
-    localStorage.removeItem('history');
+    if (isPlatformBrowser(this.platformId)) { //check added by Copilot
+      localStorage.removeItem('history');
+    }
     console.log('Verlauf gelöscht');
     this.counter = this.countEntries();
   }
@@ -91,7 +98,9 @@ export class App {
         this.history.splice(index, 1); // remove item from history
       }
     }
-    localStorage.setItem('history', JSON.stringify(this.history)); // update localStorage with new history
+    if (isPlatformBrowser(this.platformId)) { //check added by Copilot
+      localStorage.setItem('history', JSON.stringify(this.history)); // update localStorage with new history
+    }
     this.deleteArr = []; // clear delete array after deletion
     console.log('Ausgewählte Einträge gelöscht:', this.deleteArr); 
     this.counter = this.countEntries();
