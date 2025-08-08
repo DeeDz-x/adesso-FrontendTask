@@ -4,13 +4,14 @@ import {HttpClient} from '@angular/common/http';
 import { Header } from './header/header';
 import {MatDividerModule} from '@angular/material/divider';
 import { isPlatformBrowser } from '@angular/common';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.html',
   standalone: true,
   styleUrls: ['./app.css'],
-  imports: [FormsModule, Header, MatDividerModule],
+  imports: [FormsModule, Header, MatDividerModule, MatSnackBarModule],
 })
 
 export class App implements OnInit {
@@ -19,8 +20,11 @@ export class App implements OnInit {
   history: [number, string][] = []; // Stored as tuples to provide a unique identifier for each entry
   counter = 0; // Counter for the number of entries in the history
   deleteArr: [number, string][] = [];
+  status = '';
 
-  constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: Object) {} // Inject PLATFORM_ID to check if the code is running in the browser - modified by Copilot
+  constructor(private http: HttpClient, 
+    @Inject(PLATFORM_ID) private platformId: Object, // Inject PLATFORM_ID to check if the code is running in the browser - modified by Copilot to resolve issues with localStorage
+    private snackBar: MatSnackBar) {} 
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -31,7 +35,22 @@ export class App implements OnInit {
       }
     }
     this.counter = this.countEntries();
+    this.checkServerStatus(); // Check server status on initialization
   }
+
+  checkServerStatus() {
+    this.http.get('http://localhost:5000/api/status').subscribe(
+      (response: any) => {
+        console.log('Server Status:', response);
+        this.status = '🟢 ' + response.status;
+      },
+      (error) => {
+        console.error('Fehler beim Abrufen des Serverstatus:', error.status);
+        this.status = '🔴 Server nicht erreichbar';
+      }
+    );
+  }
+      
 
   /**
    * Submits the form input and adds it to the history.
@@ -52,6 +71,12 @@ export class App implements OnInit {
       this.http.post<{ reply: string }>('http://localhost:5000/api/text', { text: this.input })
         .subscribe(response => {
           console.log('Antwort vom Backend:', response.reply);
+          // Display the backend servers response in a snackbar
+          this.snackBar.open('Antwort vom Backend -> "' + response.reply + '"', 'X', {
+            duration: 5000,
+            horizontalPosition: 'left',
+            verticalPosition: 'bottom'
+          });
         });
 
       this.input = '';
@@ -65,7 +90,7 @@ export class App implements OnInit {
    */
   countEntries(){
     const count  = this.history.length;
-    console.log(`Anzahl der Einträge im Verlauf: ${count}`);
+
     return count;
   }
 

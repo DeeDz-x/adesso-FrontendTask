@@ -26,3 +26,19 @@ mat-divider {
     margin: 10px 0;
     color: #ff0000;
 }
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 10px;
+}
+
+#server-status {
+    margin-right: 15px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 16px;
+}

@@ -22,3 +22,7 @@
   <button id="clear-history" (click)="clearHistory()">Verlauf löschen</button>
   <button id="delete-selected" (click)="deleteSelected()">Ausgewählte löschen</button>
 </main>
+<footer>
+  <p id="server-status">Status: {{status}}</p>
+   <button id="fetch-status" (click)="checkServerStatus()"> Refresh ↺</button>
+</footer>
