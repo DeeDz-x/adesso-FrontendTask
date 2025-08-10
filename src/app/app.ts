@@ -16,11 +16,11 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 export class App implements OnInit {
 
-  input = '';
+  input = ''; // Input field for user text
   history: [number, string][] = []; // Stored as tuples to provide a unique identifier for each entry
   counter = 0; // Counter for the number of entries in the history
   deleteArr: [number, string][] = [];
-  status = '';
+  status = ''; // Status of the server connection, is set on initialization
 
   constructor(private http: HttpClient, 
     @Inject(PLATFORM_ID) private platformId: Object, // Inject PLATFORM_ID to check if the code is running in the browser - modified by Copilot to resolve issues with localStorage
@@ -38,6 +38,11 @@ export class App implements OnInit {
     this.checkServerStatus(); // Check server status on initialization
   }
 
+  /**
+   * Checks the status of the server by making a GET request to the /api/status endpoint.
+   * If the request is successful, it updates the status with a green dot and the server status.
+   * If the request fails, it updates the status with a red dot and an error message.
+   */
   checkServerStatus() {
     this.http.get('http://localhost:5000/api/status').subscribe(
       (response: any) => {
@@ -71,7 +76,7 @@ export class App implements OnInit {
       this.http.post<{ reply: string }>('http://localhost:5000/api/text', { text: this.input })
         .subscribe(response => {
           console.log('Antwort vom Backend:', response.reply);
-          // Display the backend servers response in a snackbar
+          // Display the backend servers response in a snackbar to be user-friendly
           this.snackBar.open('Antwort vom Backend -> "' + response.reply + '"', 'X', {
             duration: 5000,
             horizontalPosition: 'left',

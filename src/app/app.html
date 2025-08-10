@@ -11,8 +11,10 @@
 
   <h3>Verlauf</h3>
   <ul>
+    <!-- All history entries are displayed as a list to show changes to the user -->
     @for (entry of history; track entry) {
       <li style="list-style-type: none;" >
+        <!-- Entries are displayed with a checkbox for selection to allow item deletion -->
         <input type="checkbox" (change)="selectItem(entry)" />
         {{entry[1]}}
       </li>
